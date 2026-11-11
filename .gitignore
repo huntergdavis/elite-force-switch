@@ -1,0 +1,11 @@
+/references
+/first-light/build/
+/first-light/*.elf
+/first-light/*.nacp
+/first-light/*.nro
+/sp-probe/build/
+/work/
+/work-sp/
+/bootstrap/build/
+/evidence/
+/.dunkingsheep/
