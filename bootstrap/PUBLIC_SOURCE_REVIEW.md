@@ -1,11 +1,10 @@
-# Public source preparation: review required
+# Source provenance and distribution notes
 
-No release or push has been approved by this document. The owner requires a
-public fork without retail game data, keys, device logs, or unlicensed binary
-artifacts. Users must supply their own original game files; see
-[DATA_REQUIREMENTS.md](DATA_REQUIREMENTS.md). Do not publish until the owner
-verifies gameplay and the complete proposed history and license review have
-been independently accepted.
+The owner approved a 0.1 release after testing gameplay, controls and the pause
+menu on Switch. The public source must exclude retail game data, keys, device
+logs and unlicensed artwork. Users must supply their own original game files;
+see [DATA_REQUIREMENTS.md](DATA_REQUIREMENTS.md). This document records source
+provenance and questions still relevant to distribution.
 
 ## Source provenance requiring review
 
@@ -51,15 +50,15 @@ UI fragments in `patch_ui_file_cleanup.py` and `patch_ui_narrowing.py`, copied
 SP/NX input code in `patch_nx_input.py`, and an unresolved template provenance
 for `first-light/Makefile`. `patch_ui_readfile_cleanup.py` also reproduces SP
 UI fragments. Review the actual upstream notices and STEF terms, copied source,
-dependencies and the distribution obligations for resulting binaries. The
-repository currently has no tracked LICENSE or NOTICE; do not infer a license
-from these notes.
+dependencies and the distribution obligations for resulting binaries. At the
+time of that screen there was no tracked license or notice. The source candidate
+now includes [third-party notices](../THIRD_PARTY_NOTICES.md), pinned GPL texts
+and the original STEF game-source license document.
 
-The history also contains author/committer email addresses, which would become
-public if those commits are pushed. The owner should review that disclosure.
+The older development history contains author/committer email addresses. This
+release candidate uses a separate source snapshot rather than that history.
 The ignored evidence directory contains retail archives and local logs; never
-stage it. Repeat all checks for the exact proposed refs, including this update,
-before any publication.
+stage it. Repeat checks for the exact release refs before publication.
 
 ## Upstream game-source terms examined
 
@@ -77,10 +76,10 @@ including the CD-key restriction, must be resolved by a qualified reviewer or
 rights holder before publishing either source or binary. Adding notices alone
 does not resolve those questions.
 
-The owner has now reported that the controls build works. That test does not
-establish licensing or establish that a clean, reproducible release build
-matches the incrementally linked candidate. Independent license/provenance
-review and exact-source/artifact review remain prerequisites to publication.
+The owner has now reported that the pause and flash-fix build works. That test
+does not establish licensing or byte-identical fresh builds. The current build
+script prepares engine and SP source directories matching the tested tree; see
+the root README for verification limits.
 
 An independent reviewer inspected the candidate link command and identified
 isolated game/UI and SP bridge libraries, SDL2, EGL, glapi, drm_nouveau, glad,
