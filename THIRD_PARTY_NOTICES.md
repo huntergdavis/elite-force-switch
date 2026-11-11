@@ -20,12 +20,13 @@ lineage; consult the pinned upstream tree for individual notices and credits.
 The UI patch scripts and tests contain or are derived from expressions,
 identifiers and structures in the pinned SP game/UI sources. Their complete
 file-level provenance and applicable rights remain under review. The
-accompanying [STEF license transcription](licenses/STEF-Game-Source-License-transcription.txt)
-was converted to plain text from the pinned `efgame/STEF Game Source License.doc`
-with LibreOffice; it is provided for inspection, not represented as the
-original document. The original document SHA-256 is
+[original STEF license document](licenses/STEF%20Game%20Source%20License.doc)
+is included byte-for-byte from the pinned reference checkout. The accompanying
+[plain-text transcription](licenses/STEF-Game-Source-License-transcription.txt)
+was converted from that document and is provided for convenience. The original
+document SHA-256 is
 `167369d20489df17a0e0f823aec76ed44099204c5dd72dc2333f51790f6febc9`.
-Consult the original in the pinned checkout and verify the transcription.
+Consult the original document if the transcription differs.
 
 ## VoyagerNX
 

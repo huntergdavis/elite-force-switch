@@ -1,23 +1,25 @@
 # Elite Force single-player on Nintendo Switch
 
 An experimental Nintendo Switch port of *Star Trek: Voyager – Elite Force*
-single-player, built on the VoyagerSP and VoyagerNX projects. On a Switch, the
-current controls build has reached the campaign and the owner reports that
-gameplay controls work. The whole campaign, saves, cinematics, and every game
-edition have not been tested.
+single-player, built on the VoyagerSP and VoyagerNX projects. The 0.1 beta
+candidate has been tested on Switch: campaign gameplay, controller input,
+and the single-player pause menu and saving work according to the device
+tester. The whole campaign, cinematics, and every game edition have not been
+tested.
 
-## Planned 0.1 beta
+## 0.1 beta
 
-The first beta is planned after the single-player pause menu is fixed. In the
-current tested build, pressing Start during the campaign can open the
-multiplayer menu instead of the menu used to save. The fix and a new Switch
-build are in progress; no 0.1 beta has been published yet.
+The 0.1 beta candidate restores the original single-player pause menu and fixes
+a brief menu flash caused by capturing save thumbnails. The tested local build
+also carries a locally sourced game icon; retail artwork is not included in
+the source repository. Publication of a downloadable build is pending review
+of the bundled source terms and release contents.
 
 ## What you need
 
 - A Nintendo Switch set up to run homebrew.
 - Your own legitimately obtained copy of Elite Force and its original game data.
-- A Switch build of this port. A public release has not yet been published.
+- A Switch build of this port; a public release has not yet been published.
 
 This repository does not supply retail game data. Copy your own `pak0.pk3`,
 `pak1.pk3`, `pak2.pk3`, and `pak3.pk3` from the game's `BaseEF` directory to:
@@ -27,8 +29,7 @@ sdmc:/switch/elite-force-switch/baseEF/
 ```
 
 Place the port's NRO in `sdmc:/switch/elite-force-switch/`, then launch it from
-the Homebrew Menu. The tested build is named `elite-force-controls.nro` on the
-owner's Switch. The exact files required may vary by game edition and patch
+the Homebrew Menu. The exact files required may vary by game edition and patch
 level; see [data requirements](bootstrap/DATA_REQUIREMENTS.md). Keep your game
 files, keys, saves, and personal logs out of public uploads.
 
@@ -48,11 +49,12 @@ packaging steps. For the experimental NX GL1 build, run
 directory; the ELF is under its `build/Release/` directory. The scripts use
 local pinned reference checkouts.
 
-The owner-tested controls NRO was built incrementally from a manually patched
-tree. That tree also applied the startup-logo suppression and UI-route tracing
-patches; the normal build script does not currently apply them. The normal
-build has not been shown to reproduce the tested NRO or its startup behavior.
-A clean, reproducible release build has not yet been verified.
+The tested NRO was built incrementally from a prepared tree with the startup
+logo suppression and UI-route tracing patches enabled. The build script now
+applies the same patches: the prepared engine and game source directories and
+the principal build inputs have been compared to the tested tree. A fresh
+binary has not yet been compared byte for byte with the tested NRO; build
+metadata and a locally supplied icon can differ.
 
 ## Source and licensing
 

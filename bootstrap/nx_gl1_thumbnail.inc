@@ -63,3 +63,27 @@ void NX_CaptureSaveThumb(void) {
     ri.Hunk_FreeTempMemory(pixels);
     nx_thumb_valid = qtrue;
 }
+
+/* Called between the game and menu draw on the single-threaded NX GL1 path.
+ * Complete the queued game rendering and capture the back buffer without
+ * swapping it. The menu can then be drawn into the same presented frame. */
+int NX_CapturePendingBeforeMenu(void) {
+    if (!nx_thumb_pending || !tr.registered || !r_skipBackEnd || r_skipBackEnd->integer)
+        return 0;
+    R_IssuePendingRenderCommands();
+    if (tess.numIndexes) {
+        RB_EndSurface();
+        /* If the backend could not finish its surface, keep the existing
+         * one-frame suppression and capture-at-swap behavior. */
+        if (tess.numIndexes) return 0;
+    }
+    /* Force the next 2D draw to begin a fresh surface after our mid-frame
+     * flush, even if it happens to use the previous HUD shader. */
+    tess.shader = NULL;
+    NX_CaptureSaveThumb();
+    if (nx_thumb_valid) return 1;
+    /* Capture clears the pending flag even on failure. Retry at swap, while
+     * the caller retains its original one-frame menu suppression. */
+    nx_thumb_pending = qtrue;
+    return 0;
+}

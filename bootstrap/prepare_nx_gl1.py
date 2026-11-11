@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Select NX GL1 in an already-prepared disposable SP engine tree."""
 from pathlib import Path
+import subprocess
 import sys
 
 work = Path(sys.argv[1])
@@ -8,7 +9,7 @@ cmake = work / 'EFAndroid-SP/app/jni/src/CMakeLists.txt'
 s = cmake.read_text()
 changes = {
     'set(EF_USE_VULKAN TRUE)': 'set(EF_USE_VULKAN FALSE)',
-    '  /work/switch_main.c': '  /work/switch_main.c\n  /work/nx_gl1_compat.c',
+    '  /work/game_data_preflight.c': '  /work/game_data_preflight.c\n  /work/nx_gl1_compat.c',
     '${EF}/sdl/sdl_gamma.c ${EF}/sdl/sdl_glimp.c':
         '${EF}/sdl/sdl_gamma.c ${EF}/sdl/sdl_glimp_nx.c',
     'list(APPEND EF_TARGET_SRC ${RENDERER_VK_SRC} ${RENDERCOMMON_SRC})':
@@ -74,3 +75,10 @@ for name in ('GLimp_SpawnRenderThread', 'GLimp_RendererSleep', 'GLimp_FrontEndSl
         raise SystemExit(f'unexpected renderer thread import: {name}')
     s = s.replace(old, f'ri.{name} = NULL;')
 client.write_text(s)
+
+# The SP save-thumbnail request normally suppresses the pause menu for a
+# presented frame. NX GL1 can finish the game draw and capture its back buffer
+# before drawing the menu, so preserve a clean thumbnail without that flash.
+screen = work / 'EFAndroid-SP/app/jni/efcode/client/cl_scrn.c'
+subprocess.run([sys.executable, str(Path(__file__).with_name('patch_nx_gl1_menu_flash.py')),
+                str(screen)], check=True)

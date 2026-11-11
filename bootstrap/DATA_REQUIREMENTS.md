@@ -15,8 +15,8 @@ message also requests the 1.2 patch files. The search uses engine search paths
 and case-insensitive basename comparisons, not just the advisory's literal
 file tests. A checksum mismatch emits a warning in this function; these checks
 are not proof of usable or complete game data. The next startup check requires
-`default.cfg` to be nonempty and readable through the engine filesystem. Further content and
-campaign requirements have not been validated.
+`default.cfg` to be nonempty and readable through the engine filesystem.
+Requirements for all editions and later campaign content have not been validated.
 
 The upstream desktop importer's documented intended retail set is
 `pak0.pk3` through `pak3.pk3` plus `efgamex86.dll`
@@ -29,11 +29,9 @@ current Switch build neither performs that importer's token check nor
 establishes that the DLL is a runtime requirement. Do not interpret that as a
 license to use data you do not own.
 
-The captured owner test (`evidence/startup-crash/`) reached `Com_Init`; its
-filesystem log listed the default `baseEF` search path, zero files in PK3s,
-and the missing-data fatal message. This does not distinguish missing,
-misplaced, unreadable, or invalid data, and it does not establish completion of
-fatal shutdown. No gameplay or retail-data validation has been demonstrated.
+An early missing-data diagnostic reached `Com_Init` but could not mount the
+game archives. The later 0.1 candidate reached single-player gameplay with
+the four files described below; this is not validation of every retail edition.
 
 ## Supplying game data on Switch
 

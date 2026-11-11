@@ -16,7 +16,10 @@ tar -xf "$work/source.tar" -C "$work"
 git -C "$root/references/VoyagerNX" show 649a63f6ee2a80c17a11b4ef35a42e6d2c7e0c6f:code/sys/sys_nx.c > "$work/EFAndroid-SP/app/jni/efcode/sys/sys_nx.c"
 git -C "$root/references/VoyagerNX" show 649a63f6ee2a80c17a11b4ef35a42e6d2c7e0c6f:code/sdl/sdl_input_nx.c > "$work/EFAndroid-SP/app/jni/efcode/sdl/sdl_input_nx.c"
 python3 "$root/bootstrap/patch_nx_input.py" "$work/EFAndroid-SP/app/jni/efcode/sdl/sdl_input_nx.c" "$work/EFAndroid-SP/app/jni/efcode/sdl/sdl_input.c"
-cp "$root/bootstrap/switch_main.c" "$work/switch_main.c"
+# The owner-tested 0.1 build enabled the bounded UI route trace.  Its
+# implementation is guarded in switch_main.c and is required by the trace
+# hooks applied below.
+{ printf '#define SWITCH_UI_ROUTE_TRACE 1\n'; cat "$root/bootstrap/switch_main.c"; } > "$work/switch_main.c"
 cp "$root/bootstrap/game_data_preflight.c" "$root/bootstrap/game_data_preflight.h" "$work/"
 cp "$root/bootstrap/renderer_cvar_adapter.c" "$work/renderer_cvar_adapter.c"
 cp "$root/bootstrap/switch_platform.c" "$work/switch_platform.c"
@@ -122,13 +125,16 @@ for bridge in ('sp_bridge.cpp', 'sp_ui_bridge.cpp'):
     if text.count(old) != 1: raise SystemExit(f'unexpected loader include in {bridge}')
     path.write_text(text.replace(old, '#include "switch_static_loader.h"'))
 PY
-python3 "$root/bootstrap/patch_ui_clipboard.py" "$work/EFAndroid-SP/app/jni/sp/sp_ui_bridge.cpp"
+# The 0.1 hardware-tested tree predates the optional clipboard and UI file
+# cleanup patches. Keep the build aligned with that tested behavior.
+python3 "$root/bootstrap/patch_ui_route_trace.py" "$work/EFAndroid-SP/app/jni/efcode/client/cl_ui.c" "$work/EFAndroid-SP/app/jni/sp/sp_ui_bridge.cpp"
 python3 "$root/bootstrap/patch_game_link.py" "$work/EFAndroid-SP/app/jni/src/CMakeLists.txt"
 python3 "$root/bootstrap/patch_ui_narrowing.py" "$work/efgame/src/ui"
-python3 "$root/bootstrap/patch_ui_file_cleanup.py" "$work/efgame/src/ui"
-python3 "$root/bootstrap/patch_ui_readfile_cleanup.py" "$work/efgame/src/ui"
+cp "$root/bootstrap/switch_ui_media.h" "$work/EFAndroid-SP/app/jni/sp/"
+python3 "$root/bootstrap/patch_switch_ui_lifetime.py" "$work/EFAndroid-SP/app/jni/sp/sp_ui_bridge.cpp" "$work/efgame/src/ui/ui_atoms.cpp"
 python3 "$root/bootstrap/patch_fs_null_check.py" "$work/EFAndroid-SP/app/jni/efcode/qcommon/files.c"
 python3 "$root/bootstrap/patch_switch_cdkey.py" "$work/EFAndroid-SP/app/jni/efcode/qcommon/common.c"
+python3 "$root/bootstrap/patch_switch_startup_logo.py" "$work/EFAndroid-SP/app/jni/efcode/qcommon/common.c"
 cp "$root/bootstrap/switch_gamepad_defaults.inc" "$work/EFAndroid-SP/app/jni/efcode/qcommon/"
 python3 "$root/bootstrap/patch_switch_gamepad_defaults.py" "$work/EFAndroid-SP/app/jni/efcode/qcommon/common.c"
 python3 "$root/bootstrap/patch_switch_multicast.py" "$work/EFAndroid-SP/app/jni/efcode/qcommon/net_ip.c"

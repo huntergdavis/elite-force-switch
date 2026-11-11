@@ -20,10 +20,19 @@ static struct { int vidWidth, vidHeight; } glConfig;
 static byte pixels[16];
 static const byte rgb[] = { 1,2,3, 4,5,6, 0,0, 7,8,9, 10,11,12, 0,0 };
 static int frees, allocs, pending_error, read_failure, query_failure, alignment=4, row_length, skip_rows, skip_pixels, pack_buffer, allocation_failure;
+static struct { int registered; } tr = { 1 };
+typedef struct { int integer; } cvar_t;
+static cvar_t skip_backend;
+static cvar_t *r_skipBackEnd = &skip_backend;
+static struct { int numIndexes; void *shader; } tess;
+static int capture_order;
+static void R_IssuePendingRenderCommands(void) { assert(capture_order==0); capture_order=1; }
+static void RB_EndSurface(void) { assert(capture_order==1); capture_order=2; tess.numIndexes=0; }
 static int qglGetError(void) { int e=pending_error; pending_error=0; return e; }
 static void qglGetIntegerv(int name, int *v) { *v = name==GL_PACK_ALIGNMENT ? alignment : name==GL_PACK_ROW_LENGTH ? row_length : name==GL_PACK_SKIP_ROWS ? skip_rows : name==GL_PACK_SKIP_PIXELS ? skip_pixels : name==GL_PIXEL_PACK_BUFFER_BINDING ? pack_buffer : 0; if(query_failure) pending_error=7; }
 static void qglReadPixels(int x,int y,int w,int h,int fmt,int type,void *dst) {
     assert(!x && !y && w==2 && h==2 && fmt==GL_RGB && type==GL_UNSIGNED_BYTE);
+    if (capture_order) { assert(capture_order==2); capture_order=3; }
     if (read_failure) { pending_error=9; return; }
     memcpy(dst,rgb,sizeof(rgb));
 }
@@ -54,5 +63,19 @@ int main(void) {
     glConfig.vidHeight=2;
     glConfig.vidWidth=16385; NX_RequestSaveThumb(); NX_CaptureSaveThumb(); assert(allocs==3 && !NX_GetSaveThumb(result));
     glConfig.vidWidth=16384; glConfig.vidHeight=16384; NX_RequestSaveThumb(); NX_CaptureSaveThumb(); assert(allocs==3 && !NX_GetSaveThumb(result));
-    NX_ResetSaveThumb(); assert(!NX_GetSaveThumb(result)); return 0;
+    NX_ResetSaveThumb(); assert(!NX_GetSaveThumb(result));
+    /* The pending game draw is flushed before thumbnail readback; the next UI
+       draw must start a fresh surface even when it uses the same shader. */
+    glConfig.vidWidth=2; glConfig.vidHeight=2;
+    tess.numIndexes=6; tess.shader=&ri; NX_RequestSaveThumb();
+    assert(NX_CapturePendingBeforeMenu());
+    assert(capture_order==3 && tess.numIndexes==0 && tess.shader==NULL);
+    assert(NX_GetSaveThumb(result) && result[0]==1 && result[1]==2 && result[2]==3);
+    /* A failed pre-capture must retain the old at-swap retry. */
+    NX_ResetSaveThumb(); capture_order=0; tess.numIndexes=6; tess.shader=&ri;
+    read_failure=1; NX_RequestSaveThumb();
+    assert(!NX_CapturePendingBeforeMenu() && nx_thumb_pending);
+    read_failure=0; capture_order=0; NX_CaptureSaveThumb();
+    assert(!nx_thumb_pending && NX_GetSaveThumb(result) && result[0]==1);
+    return 0;
 }
