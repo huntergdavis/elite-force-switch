@@ -1,6 +1,12 @@
 # Experimental SP engine bootstrap
 
-This is a work-in-progress integration attempt, not a playable build. The Switch
+These are historical development notes. The current GL1 build has since been
+tested on Switch with campaign gameplay, controller input and the pause/save
+menu; see the [project README](../README.md) for current build instructions
+and their limitations. Statements below about missing gameplay, old lifecycle
+behavior and absent hardware tests describe earlier experiments.
+
+The earlier integration attempt was not yet playable. The Switch
 entry point in `switch_main.c` calls the pinned VoyagerSP engine's actual
 platform/time setup, sets the binary, install and home paths to
 `sdmc:/switch/elite-force-switch`, then calls `CON_Init`, `Com_Init`,

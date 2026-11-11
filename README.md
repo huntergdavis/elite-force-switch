@@ -19,7 +19,8 @@ of the bundled source terms and release contents.
 
 - A Nintendo Switch set up to run homebrew.
 - Your own legitimately obtained copy of Elite Force and its original game data.
-- A Switch build of this port; a public release has not yet been published.
+- A Switch build of this port, made using the recipe below. No prebuilt release
+  is included here.
 
 This repository does not supply retail game data. Copy your own `pak0.pk3`,
 `pak1.pk3`, `pak2.pk3`, and `pak3.pk3` from the game's `BaseEF` directory to:
@@ -35,19 +36,45 @@ files, keys, saves, and personal logs out of public uploads.
 
 ## Building
 
-The current build is experimental and requires Docker, the pinned devkitPro
-image, and local reference checkouts of
-[VoyagerSP-Android](https://github.com/imjustadudegamer/VoyagerSP-Android) and
-[VoyagerNX](https://github.com/faithvoid/VoyagerNX). The scripts expect them in
-`references/VoyagerSP-Android` and `references/VoyagerNX`, at the revisions
-listed in [the source review](bootstrap/PUBLIC_SOURCE_REVIEW.md). See
-[`bootstrap/build.sh`](bootstrap/build.sh) and
-[`bootstrap/package.sh`](bootstrap/package.sh) for the current build and
-packaging steps. For the experimental NX GL1 build, run
-`./bootstrap/build.sh nx-gl1`, then pass the resulting ELF to
-`./bootstrap/package.sh <path-to-elf>`. The build prints its experiment
-directory; the ELF is under its `build/Release/` directory. The scripts use
-local pinned reference checkouts.
+The build recipe needs Git, Python 3, a POSIX shell, and Docker. Docker must be
+able to download and run the pinned devkitPro image. It also needs separate
+local checkouts of [VoyagerSP-Android](https://github.com/imjustadudegamer/VoyagerSP-Android)
+and [VoyagerNX](https://github.com/faithvoid/VoyagerNX). From this repository's
+root, obtain the exact source revisions used by the recipe:
+
+```sh
+mkdir -p references
+git clone https://github.com/imjustadudegamer/VoyagerSP-Android.git references/VoyagerSP-Android
+git -C references/VoyagerSP-Android checkout --detach c73750361cfc22c1afb3a2c160fa9c5df57214db
+git clone https://github.com/faithvoid/VoyagerNX.git references/VoyagerNX
+git -C references/VoyagerNX checkout --detach 649a63f6ee2a80c17a11b4ef35a42e6d2c7e0c6f
+```
+
+Build the GL1 renderer used by the tested Switch build:
+
+```sh
+./bootstrap/build.sh nx-gl1
+```
+
+The script prints an `Engine bootstrap experiment directory`. When the build
+finishes, its ELF is at `build/Release/voyagersp.elf` inside that directory.
+Pass that exact file to [`bootstrap/package.sh`](bootstrap/package.sh):
+
+```sh
+# Replace engine.REPLACE_ME with the directory printed by the build.
+./bootstrap/package.sh bootstrap/build/engine.REPLACE_ME/build/Release/voyagersp.elf
+```
+
+The packaging script prints the new package directory. Copy its
+`elite-force-engine.nro` to the Switch directory above. The script packages no
+retail icon or game data. The upstream checkouts and build outputs are ignored
+by Git and must not be uploaded with the release.
+
+The tested Switch recipe does not save entered CD keys: its Switch-specific
+patch disables key-file writes. It does not change the upstream key-reading or
+validation functions; the pinned upstream's Elite Force validation branch
+accepts any key. Consult the upstream license terms before using or
+redistributing the resulting build.
 
 The tested NRO was built incrementally from a prepared tree with the startup
 logo suppression and UI-route tracing patches enabled. The build script now
